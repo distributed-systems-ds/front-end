@@ -1,7 +1,7 @@
 import axios from "axios";
 import authHeader from "./authHeader";
 
-const URL_API = "http://localhost:8080/api/orders/";
+const URL_API = `${import.meta.env.VITE_API_URL}/api/orders/`;
 
 interface OrderProps {
   userEmail: string;

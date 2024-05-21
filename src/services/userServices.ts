@@ -12,7 +12,7 @@ interface UserDTO {
   role: string;
 }
 
-const URL_API = "http://localhost:8080/api/";
+const URL_API = `${import.meta.env.VITE_API_URL}/api/`;
 
 const addUser = (userDTO: UserDTO) => {
   return axios.post(`${URL_API}users/create`, userDTO, {

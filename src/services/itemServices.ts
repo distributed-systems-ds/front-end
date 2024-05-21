@@ -1,7 +1,7 @@
 import axios from "axios";
 import authHeader from "./authHeader";
 
-const URL_API = "http://localhost:8080/api/items/";
+const URL_API = `${import.meta.env.VITE_API_URL}/api/items/`;
 
 interface ItemProps{
     description: string, 
