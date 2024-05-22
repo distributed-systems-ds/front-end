@@ -11,7 +11,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     outputs:
-      release-tag: ${{ steps.latesttag.outputs.tag }}
+      release-tag: ${{ github.sha }}
 
     steps:
     - name: Checkout repository
@@ -24,7 +24,7 @@ jobs:
         fallback: v1.0.0
 
     - name: Build Docker image
-      run: docker build -t ${{ secrets.DOCKER_USERNAME }}/eshop-front:${{ steps.latesttag.outputs.tag }} -t ${{ secrets.DOCKER_USERNAME }}/eshop-front:latest --build-arg VITE_API_URL=${{ secrets.VITE_API_URL }} .
+      run: docker build -t ${{ secrets.DOCKER_USERNAME }}/eshop-front:${{ github.sha }} -t ${{ secrets.DOCKER_USERNAME }}/eshop-front:latest --build-arg VITE_API_URL=${{ secrets.VITE_API_URL }} .
 
     - name: Log in to Docker Hub
       if: success()
