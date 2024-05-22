@@ -23,7 +23,7 @@ const Login = () => {
               marginBottom: "1rem",
             }}
           >
-            E-Shop !!!!
+            E-Shop !
           </Typography>
           <Typography
             variant="h6"
