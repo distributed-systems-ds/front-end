@@ -25,4 +25,4 @@ jobs:
 
     - name: Push Docker image
       if: success()
-      run: docker push ${{ secrets.DOCKER_USERNAME }}/eshop-back --all-tags
+      run: docker push ${{ secrets.DOCKER_USERNAME }}/eshop-front --all-tags
