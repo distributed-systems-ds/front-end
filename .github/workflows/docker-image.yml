@@ -9,15 +9,22 @@ on:
 jobs:
 
   build:
-
     runs-on: ubuntu-latest
+    outputs:
+      release-tag: ${{ steps.latesttag.outputs.tag }}
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
 
+    - name: Get Latest Tag
+      id: latesttag
+      uses: WyriHaximus/github-action-get-previous-tag@v1.4.0
+      with:
+        fallback: v1.0.0
+
     - name: Build Docker image
-      run: docker build -t ${{ secrets.DOCKER_USERNAME }}/eshop-front:${{ github.sha }} -t ${{ secrets.DOCKER_USERNAME }}/eshop-front:latest --build-arg VITE_API_URL=${{ secrets.VITE_API_URL }} .
+      run: docker build -t ${{ secrets.DOCKER_USERNAME }}/eshop-front:${{ steps.latesttag.outputs.tag }} -t ${{ secrets.DOCKER_USERNAME }}/eshop-front:latest --build-arg VITE_API_URL=${{ secrets.VITE_API_URL }} .
 
     - name: Log in to Docker Hub
       if: success()
@@ -26,3 +33,28 @@ jobs:
     - name: Push Docker image
       if: success()
       run: docker push ${{ secrets.DOCKER_USERNAME }}/eshop-front --all-tags
+
+  update:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Checkout external repository
+        uses: actions/checkout@v2
+        with:
+          repository: distributed-systems-ds/deployment-config
+          ref: "main"
+          path: eshop-deployment
+          token: ${{ secrets.ACCESS_TOKEN }}
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Update values.yml with new tag
+        run: |
+          cd eshop-deployment/eshop-front
+          sed -i 's|image: danieljaraba/eshop-front:.*|image: danieljaraba/eshop-front:${{ needs.build.outputs.release-tag }}|' values.yaml
+          git config --global user.email "${{ secrets.DOCKER_USERNAME }}"
+          git config --global user.name "${{ secrets.DOCKER_USERNAME }}"
+          git add values.yaml
+          git commit -m "Update image tag to ${{ needs.build.outputs.release-tag }}"
+          git push
